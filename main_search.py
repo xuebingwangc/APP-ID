@@ -113,7 +113,7 @@ def transform_pfas1(list_database,df_formula,num_thre=10):
         if(list_data==[]):
             continue
         df_i=pd.DataFrame({"Formula_":list_data,"trans":list_trans,"num":list_num,"kind":list_kind,"f":f,})
-        df_i=df_i.sort_values(by=["num","kind","f"],ascending=["True","True","False"])
+        df_i=df_i.sort_values(by=["num","kind","f"],ascending=[True,True,False])
         df_i=df_i.reset_index(drop=True)
         list_for.append(df_formula["Formula_mole"][i])
         list_error.append(df_formula["Error(ppm)"][i])
@@ -125,7 +125,7 @@ def transform_pfas1(list_database,df_formula,num_thre=10):
     if(list_for==[]):
         return pd.DataFrame()
     df_=pd.DataFrame({"Formula":list_for,"Error(ppm)":list_error,"Database_formula":list_da,"Trans":list_t,"num":list_n,"kind":list_k,"f":list_f})
-    df_=df_.sort_values(by=["num","kind","f"],ascending=["True","True","False"])
+    df_=df_.sort_values(by=["num","kind","f"],ascending=[True,True,False])
     df_=df_.reset_index(drop=True)
     return df_
 # rank candidate from offline pubchem database
