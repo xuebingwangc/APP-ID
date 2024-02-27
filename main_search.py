@@ -77,15 +77,33 @@ def trans_pfas(cac_formula,database_formula,num_thre):
     list3=[]
     for i in range(len(list_cac)):
         list3.append(list_cac[i]-list_data[i])
+    #set CF2,CH2,CFH F2,H2,HF as 1 num   
+    num=abs(list3[0])+abs(list3[2])+abs(list3[4])+abs(list3[5])+abs(list3[6])+abs(list3[7])
+    if(num>num_thre):
+                return -1,-1,-1,""
+    num_hf=list3[1]+list3[3]
+    max_hf=max(list3[1],list3[3],num_hf)
+    min_hf=min(list3[1],list3[3],num_hf)
+    if((list3[0]>0 and max_hf>1) ):
+        if(max_hf>2*list3[0]):
+            num=num+0.5*abs(list3[1])+0.5*abs(list3[3])-abs(list3[0])
+        else:
+            num=num+0.5*abs(list3[1])+0.5*abs(list3[3])-int(max_hf/2)
+    elif(list3[0]<0 and min_hf<-1):
+        if(abs(min_hf)>2*abs(list3[0])):
+            num=num+0.5*abs(list3[1])+0.5*abs(list3[3])-abs(list3[0])
+        else:
+            num=num+0.5*abs(list3[1])+0.5*abs(list3[3])-int(abs(min_hf)/2)
+    else:
+        num=num+0.5*abs(list3[1])+0.5*abs(list3[3])
+    if(num>num_thre):
+                return -1,-1,-1,""        
+    for i in range(len(list3)):   
         if(list3[i]!=0):
             if(i!=1 and i!=3):
-                num=num+abs(list3[i])
                 kind=kind+1
             else:
-                num=num+0.5*abs(list3[i])
                 kind_hf+=1
-            if(num>num_thre):
-                return -1,-1,-1,""
     return num,kind,kind_hf,listtoformula(list3)
 def transform_pfas1(list_database,df_formula,num_thre=10):
     list_for=[]
