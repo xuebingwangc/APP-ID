@@ -116,42 +116,21 @@ def DP(str1,str2,error=0.01,minmz=0,maxmz=2000):
     spec2=MSMSspe(str2)
     if(len(spec1)==0 or len(spec2)==0):
         return 0 
-    spec=spec1.copy()
-    for i in range(len(spec2)):
-        flag=1
-        for j in range(len(spec1)):
-            if (abs(spec2[i,0]-spec1[j,0])<=error):
-                flag=0
-                break
-        if(flag==1):
-            spec=np.row_stack((spec,spec2[i]))
-    add=len(spec)-len(spec1)
-    if(add==0):
-        spec1_1=spec1.copy()
-    else:
-        spec1_1=np.row_stack(((spec1),np.zeros(shape=(add,2))))
-    spec2_1=spec.copy()
-    spec2_1[:,1]=0
-    for i in range(len(spec2_1)):
-        for j in range(len(spec2)):
-            if (abs(spec2[j,0]-spec2_1[i,0])<=error and spec2[j,1]>spec2_1[i,1]):
-                spec2_1[i,1]=spec2[j,1] 
-    if(len(spec1_1)==1):
-        max1=spec1_1[0,1]
-    else:
-        max1=max(spec1_1[:,1])
-    if(len(spec2_1)==1):
-        max2=spec2_1[0,1]
-    else:
-        max2=max(spec2_1[:,1])
-    if(max1==0 or max2==0):
+    spec=spec2.copy() 
+    alignment=np.zeros(shape=(len(spec1),3)) # caculate alignment matrix
+    alignment[:,0:2]=spec1
+    for i in range(len(spec1)):
+        match=abs(spec[:,0]-spec1[i,0])
+        if(min(match)<=error):
+            alignment[i,2]=spec[np.argmin(match),1]
+            spec=np.delete(spec,np.argmin(match),axis=0) # avoid of rematch
+        if(len(spec)==0):
+            break
+    alignment=alignment[alignment[:,2]!=0]
+    if(len(alignment)==0):
         return 0
     else:
-        for i in range(len(spec1_1)):
-            spec1_1[i,1]=spec1_1[i,1]/max1
-        for j in range(len(spec2_1)):
-            spec2_1[j,1]=spec2_1[j,1]/max2
-    return (np.dot(spec1_1[:,1],spec2_1[:,1]))/np.sqrt(((np.dot(spec1_1[:,1],spec1_1[:,1]))*(np.dot(spec2_1[:,1],spec2_1[:,1])))) 
+        return np.dot(alignment[:,1],alignment[:,2])/np.sqrt(((np.dot(spec1[:,1],spec1[:,1]))*(np.dot(spec2[:,1],spec2[:,1]))))
 def HSS(str1,str2,mz1,mz2,error=0.01,minmz=0,maxmz=2000):
     spec1_0=MSMSspe(str1)
     spec2_0=MSMSspe(str2)
